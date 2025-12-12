@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"ip_country_project/internal/config"
+	"ip_country_project/internal/datastores"
 )
 
 func main() {
@@ -19,6 +20,33 @@ func main() {
 	fmt.Printf("Cache: enabled=%t, TTL=%v, max_size=%d\n", 
 		cfg.CacheEnabled, cfg.CacheTTL, cfg.CacheMaxSize)
 
-	// TODO: Initialize datastore, rate limiter, and HTTP server
-	fmt.Println("Configuration loaded successfully!")
+	// Test datastore loading
+	datastore := datastores.NewCSVDataStore(cfg.DatastoreFile)
+	if err := datastore.Load(); err != nil {
+		log.Fatalf("Failed to load datastore: %v", err)
+	}
+	
+	// Test successful lookup
+	location, err := datastore.FindLocation("8.8.8.8")
+	if err != nil {
+		fmt.Printf("Error finding IP 8.8.8.8: %v\n", err)
+	} else {
+		fmt.Printf("Test lookup 8.8.8.8: %s, %s\n", location.City, location.Country)
+	}
+	
+	// Test IP not found
+	location, err = datastore.FindLocation("1.2.3.4")
+	if err != nil {
+		fmt.Printf("Error finding IP 1.2.3.4: %v\n", err)
+	} else {
+		fmt.Printf("Test lookup 1.2.3.4: %s, %s\n", location.City, location.Country)
+	}
+	
+	// Test invalid IP format
+	location, err = datastore.FindLocation("invalid-ip")
+	if err != nil {
+		fmt.Printf("Error finding invalid IP: %v\n", err)
+	}
+	
+	fmt.Println("Configuration and datastore loaded successfully!")
 }
