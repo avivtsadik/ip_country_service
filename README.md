@@ -41,10 +41,27 @@ The sample data file is provided at `testdata/sample_ips.csv`.
 
 ## Running the Service
 
-### Start the Server
+### Option 1: Direct Go Run
 
 ```bash
 go run .
+```
+
+### Option 2: Docker Container
+
+**Build and run with scripts:**
+```bash
+./build.sh    # Build Docker image
+./run.sh      # Run container
+```
+
+**Manual Docker commands:**
+```bash
+# Build image
+docker build -t ip-country-service .
+
+# Run container
+docker run -p 8080:8080 ip-country-service
 ```
 
 The service will start on the configured port and display:
@@ -167,6 +184,9 @@ The project includes comprehensive tests:
 
 ```
 ├── main.go                 # Application entry point
+├── Dockerfile              # Docker container definition
+├── build.sh                # Docker build script
+├── run.sh                  # Docker run script
 ├── internal/
 │   ├── app/               # Application setup and integration tests
 │   ├── config/            # Environment variable configuration  
