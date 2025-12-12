@@ -46,9 +46,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	// API v1 endpoints
-	v1Mux := http.NewServeMux()
-	v1Mux.Handle("GET /find-country", rateLimiter.Middleware(http.HandlerFunc(handler.FindCountry)))
-	mux.Handle("/v1/", http.StripPrefix("/v1", v1Mux))
+	mux.Handle("/v1/find-country", rateLimiter.Middleware(http.HandlerFunc(handler.FindCountry)))
 
 	// Health check endpoint
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {

@@ -21,6 +21,13 @@ func NewLocationHandler(service *services.LocationService) *LocationHandler {
 }
 
 func (h *LocationHandler) FindCountry(w http.ResponseWriter, r *http.Request) {
+	// Only allow GET requests
+	if r.Method != http.MethodGet {
+		w.Header().Set("Allow", http.MethodGet)
+		h.writeError(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	// Get IP parameter from query string
 	ip := r.URL.Query().Get("ip")
 	if ip == "" {
