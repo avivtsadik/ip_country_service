@@ -3,12 +3,12 @@ package datastores
 import (
 	"encoding/csv"
 	"fmt"
-	"net"
 	"os"
 	"sync"
 
 	"ip_country_project/internal/errors"
 	"ip_country_project/internal/models"
+	"ip_country_project/internal/utils"
 )
 
 type CSVDataStore struct {
@@ -47,7 +47,7 @@ func (c *CSVDataStore) Load() error {
 
 		ip, city, country := record[0], record[1], record[2]
 
-		if !isValidIP(ip) {
+		if !utils.IsValidIP(ip) {
 			return fmt.Errorf("invalid IP address at line %d: %s", i+1, ip)
 		}
 
@@ -62,7 +62,7 @@ func (c *CSVDataStore) Load() error {
 }
 
 func (c *CSVDataStore) FindLocation(ip string) (*models.Location, error) {
-	if !isValidIP(ip) {
+	if !utils.IsValidIP(ip) {
 		return nil, errors.ErrInvalidIP
 	}
 
@@ -84,8 +84,4 @@ func (c *CSVDataStore) FindLocation(ip string) (*models.Location, error) {
 
 func (c *CSVDataStore) Close() error {
 	return nil
-}
-
-func isValidIP(ip string) bool {
-	return net.ParseIP(ip) != nil
 }
