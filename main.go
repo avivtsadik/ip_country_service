@@ -2,21 +2,18 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"ip_country_project/internal/config"
-	"ip_country_project/internal/datastores"
-	"ip_country_project/internal/handlers"
-	"ip_country_project/internal/middleware"
-	"ip_country_project/internal/services"
-	safe "ip_country_project/internal/utils"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"ip_country_project/internal/app"
+	"ip_country_project/internal/config"
+	safe "ip_country_project/internal/utils"
 )
 
 func main() {
@@ -29,36 +26,16 @@ func main() {
 	fmt.Printf("Rate limit: %.1f RPS\n", cfg.RateLimitRPS)
 	fmt.Printf("Datastore: %s (%s)\n", cfg.DatastoreType, cfg.DatastoreFile)
 
-	// Initialize datastore
-	datastore := datastores.NewCSVDataStore(cfg.DatastoreFile)
-	if err := datastore.Load(); err != nil {
-		log.Fatalf("Failed to load datastore: %v", err)
+	// Initialize application
+	application, err := app.New(cfg)
+	if err != nil {
+		log.Fatalf("Failed to initialize application: %v", err)
 	}
-
-	// Initialize service layer
-	service := services.NewLocationService(datastore)
-
-	// Initialize HTTP components
-	handler := handlers.NewLocationHandler(service)
-	rateLimiter := middleware.NewRateLimiter(cfg.RateLimitRPS)
-
-	// Setup routes
-	mux := http.NewServeMux()
-
-	// API v1 endpoints
-	mux.Handle("/v1/find-country", rateLimiter.Middleware(http.HandlerFunc(handler.FindCountry)))
-
-	// Health check endpoint
-	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
-	})
 
 	// Create server with production timeouts
 	srv := &http.Server{
 		Addr:         ":" + cfg.Port,
-		Handler:      mux,
+		Handler:      application.Handler,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  60 * time.Second,
