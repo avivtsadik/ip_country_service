@@ -99,7 +99,7 @@ go test ./internal/...
 
 ### Integration Tests Only  
 ```bash
-go test ./tests/...
+go test ./internal/app/ -v
 ```
 
 ### Verbose Output
@@ -111,23 +111,26 @@ go test ./... -v
 ```bash
 go test ./internal/services/ -v
 go test ./internal/utils/ -v
-go test ./tests/ -v
+go test ./internal/app/ -v
+go test ./internal/datastores/ -v
+go test ./internal/middleware/ -v
 ```
 
 ## Test Coverage
 
 The project includes comprehensive tests:
 
-- **Unit Tests** (16 tests) - Fast, isolated tests with mocks
+- **Unit Tests** (19 tests) - Fast, isolated tests with mocks
   - Service layer business logic
   - IP validation utilities  
   - Safe goroutine wrapper
   - Rate limiter algorithm
+  - CSV datastore functionality
 
-- **Integration Tests** (14 tests) - End-to-end functionality
+- **Integration Tests** (7 tests) - End-to-end functionality
   - HTTP handlers with full request/response cycle
-  - CSV datastore with file operations
   - Rate limiting middleware
+  - Full application flow testing
 
 ## API Documentation
 
@@ -165,7 +168,7 @@ The project includes comprehensive tests:
 ```
 ├── main.go                 # Application entry point
 ├── internal/
-│   ├── app/               # Application setup and configuration
+│   ├── app/               # Application setup and integration tests
 │   ├── config/            # Environment variable configuration  
 │   ├── datastores/        # Pluggable datastore implementations
 │   ├── handlers/          # HTTP request handlers
@@ -173,7 +176,6 @@ The project includes comprehensive tests:
 │   ├── models/            # Data models
 │   ├── services/          # Business logic layer
 │   └── utils/             # Utility functions
-├── tests/                 # Integration tests
 ├── testdata/              # Sample data files
 └── .env                   # Environment configuration
 ```

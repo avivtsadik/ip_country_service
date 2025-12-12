@@ -1,16 +1,15 @@
-package tests
+package datastores
 
 import (
 	"errors"
 	"os"
 	"testing"
 
-	"ip_country_project/internal/datastores"
 	appErrors "ip_country_project/internal/errors"
 )
 
 // Helper function to create test CSV file and datastore
-func setupTestDatastore(t *testing.T, data string) *datastores.CSVDataStore {
+func setupTestDatastore(t *testing.T, data string) *CSVDataStore {
 	t.Helper()
 
 	tmpFile, err := os.CreateTemp("", "test_*.csv")
@@ -21,7 +20,7 @@ func setupTestDatastore(t *testing.T, data string) *datastores.CSVDataStore {
 	_, _ = tmpFile.WriteString(data)
 	_ = tmpFile.Close()
 
-	ds := datastores.NewCSVDataStore(tmpFile.Name())
+	ds := NewCSVDataStore(tmpFile.Name())
 
 	// Use t.Cleanup instead of returning cleanup function
 	t.Cleanup(func() {
@@ -91,7 +90,7 @@ func TestCSVDataStore_FindLocation_InvalidIP(t *testing.T) {
 }
 
 func TestCSVDataStore_Load_InvalidFile(t *testing.T) {
-	ds := datastores.NewCSVDataStore("nonexistent.csv")
+	ds := NewCSVDataStore("nonexistent.csv")
 	err := ds.Load()
 	if err == nil {
 		t.Error("expected error loading nonexistent file")

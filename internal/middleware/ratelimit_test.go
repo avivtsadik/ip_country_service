@@ -1,15 +1,13 @@
-package tests
+package middleware
 
 import (
 	"testing"
 	"time"
-
-	"ip_country_project/internal/middleware"
 )
 
 func TestRateLimiter_Allow(t *testing.T) {
 	// Test basic allow functionality
-	rl := middleware.NewRateLimiter(2) // 2 RPS
+	rl := NewRateLimiter(2) // 2 RPS
 
 	// Should allow first 2 requests immediately
 	if !rl.Allow() {
@@ -26,7 +24,7 @@ func TestRateLimiter_Allow(t *testing.T) {
 }
 
 func TestRateLimiter_TokenRefill(t *testing.T) {
-	rl := middleware.NewRateLimiter(2) // 2 RPS
+	rl := NewRateLimiter(2) // 2 RPS
 
 	// Exhaust tokens
 	rl.Allow()
@@ -47,7 +45,7 @@ func TestRateLimiter_TokenRefill(t *testing.T) {
 }
 
 func TestRateLimiter_BurstHandling(t *testing.T) {
-	rl := middleware.NewRateLimiter(5) // 5 RPS
+	rl := NewRateLimiter(5) // 5 RPS
 	
 	// Should handle initial burst up to capacity
 	allowed := 0
@@ -64,7 +62,7 @@ func TestRateLimiter_BurstHandling(t *testing.T) {
 
 func TestRateLimiter_ZeroRPS(t *testing.T) {
 	// Edge case: 0 RPS should deny all requests
-	rl := middleware.NewRateLimiter(0)
+	rl := NewRateLimiter(0)
 	
 	if rl.Allow() {
 		t.Fatal("zero RPS should deny all requests")
@@ -73,7 +71,7 @@ func TestRateLimiter_ZeroRPS(t *testing.T) {
 
 func TestRateLimiter_HighRPS(t *testing.T) {
 	// Test with high RPS
-	rl := middleware.NewRateLimiter(100)
+	rl := NewRateLimiter(100)
 	
 	// Should allow many requests initially
 	for i := 0; i < 100; i++ {
@@ -89,7 +87,7 @@ func TestRateLimiter_HighRPS(t *testing.T) {
 }
 
 func TestRateLimiter_ConcurrentAccess(t *testing.T) {
-	rl := middleware.NewRateLimiter(10)
+	rl := NewRateLimiter(10)
 	
 	// Test concurrent access doesn't cause race conditions
 	done := make(chan bool, 20)

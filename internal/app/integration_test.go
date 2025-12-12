@@ -1,18 +1,17 @@
-package tests
+package app
 
 import (
 	"encoding/json"
-	"ip_country_project/internal/datastores"
-	"ip_country_project/internal/handlers"
-	"ip_country_project/internal/middleware"
-	"ip_country_project/internal/services"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 
-	"ip_country_project/internal/app"
+	"ip_country_project/internal/datastores"
+	"ip_country_project/internal/handlers"
+	"ip_country_project/internal/middleware"
 	"ip_country_project/internal/models"
+	"ip_country_project/internal/services"
 )
 
 func setupTestHandler(t *testing.T) http.Handler {
@@ -35,7 +34,7 @@ func setupTestHandler(t *testing.T) http.Handler {
 	})
 
 	// Use the app setup with test config
-	application, err := app.NewWithTestConfig(tmpFile.Name(), 10) // 10 RPS for tests
+	application, err := NewWithTestConfig(tmpFile.Name(), 10) // 10 RPS for tests
 	if err != nil {
 		t.Fatalf("failed to create test application: %v", err)
 	}
@@ -43,7 +42,7 @@ func setupTestHandler(t *testing.T) http.Handler {
 	return application.Handler
 }
 
-func TestHandler_FindCountry_Success(t *testing.T) {
+func TestIntegration_FindCountry_Success(t *testing.T) {
 	handler := setupTestHandler(t)
 
 	req := httptest.NewRequest("GET", "/v1/find-country?ip=8.8.8.8", nil)
@@ -69,7 +68,7 @@ func TestHandler_FindCountry_Success(t *testing.T) {
 	}
 }
 
-func TestHandler_FindCountry_MissingIP(t *testing.T) {
+func TestIntegration_FindCountry_MissingIP(t *testing.T) {
 	handler := setupTestHandler(t)
 
 	req := httptest.NewRequest("GET", "/v1/find-country", nil)
@@ -92,7 +91,7 @@ func TestHandler_FindCountry_MissingIP(t *testing.T) {
 	}
 }
 
-func TestHandler_FindCountry_InvalidIP(t *testing.T) {
+func TestIntegration_FindCountry_InvalidIP(t *testing.T) {
 	handler := setupTestHandler(t)
 
 	req := httptest.NewRequest("GET", "/v1/find-country?ip=invalid", nil)
@@ -115,7 +114,7 @@ func TestHandler_FindCountry_InvalidIP(t *testing.T) {
 	}
 }
 
-func TestHandler_FindCountry_IPNotFound(t *testing.T) {
+func TestIntegration_FindCountry_IPNotFound(t *testing.T) {
 	handler := setupTestHandler(t)
 
 	req := httptest.NewRequest("GET", "/v1/find-country?ip=1.2.3.4", nil)
@@ -138,7 +137,7 @@ func TestHandler_FindCountry_IPNotFound(t *testing.T) {
 	}
 }
 
-func TestHandler_FindCountry_MethodNotAllowed(t *testing.T) {
+func TestIntegration_FindCountry_MethodNotAllowed(t *testing.T) {
 	handler := setupTestHandler(t)
 
 	req := httptest.NewRequest("POST", "/v1/find-country?ip=8.8.8.8", nil)
@@ -157,7 +156,7 @@ func TestHandler_FindCountry_MethodNotAllowed(t *testing.T) {
 	}
 }
 
-func TestHandler_RateLimiting(t *testing.T) {
+func TestIntegration_RateLimiting(t *testing.T) {
 	// Create handler with very low rate limit for testing
 	testData := "8.8.8.8,Mountain View,United States\n"
 	tmpFile, err := os.CreateTemp("", "test_rate_limit_*.csv")
@@ -210,7 +209,7 @@ func TestHandler_RateLimiting(t *testing.T) {
 	}
 }
 
-func TestHandler_ContentType(t *testing.T) {
+func TestIntegration_ContentType(t *testing.T) {
 	handler := setupTestHandler(t)
 
 	req := httptest.NewRequest("GET", "/v1/find-country?ip=8.8.8.8", nil)
