@@ -35,10 +35,10 @@ func TestGo_PanicRecovery(t *testing.T) {
 	
 	// Wait for goroutine to complete
 	done := make(chan struct{})
-	go func() {
+	Go(func() {
 		wg.Wait()
 		close(done)
-	}()
+	})
 	
 	// Should complete without crashing the test
 	select {

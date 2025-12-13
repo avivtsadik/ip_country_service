@@ -1,6 +1,8 @@
 package app
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 
 	"ip_country_project/internal/config"
@@ -21,9 +23,18 @@ type Application struct {
 
 // New creates a new Application with all dependencies initialized
 func New(cfg *config.Config) (*Application, error) {
-	// Initialize datastore
-	datastore := datastores.NewCSVDataStore(cfg.DatastoreFile)
-	if err := datastore.Load(); err != nil {
+	// Initialize datastore based on type
+	var datastore datastores.DataStore
+	switch cfg.DatastoreType {
+	case "csv":
+		datastore = datastores.NewCSVDataStore(cfg.DatastoreFile)
+	case "json":
+		datastore = datastores.NewJSONDataStore(cfg.DatastoreFile)
+	default:
+		return nil, fmt.Errorf("unsupported datastore type: %s", cfg.DatastoreType)
+	}
+
+	if err := datastore.Load(context.Background()); err != nil {
 		return nil, err
 	}
 

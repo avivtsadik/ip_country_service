@@ -1,0 +1,27 @@
+[
+  {
+    "ip": "8.8.8.8",
+    "city": "Mountain View",
+    "country": "United States"
+  },
+  {
+    "ip": "1.0.0.1",
+    "city": "Research",
+    "country": "Australia"
+  },
+  {
+    "ip": "9.9.9.9",
+    "city": "Berkeley",
+    "country": "United States"
+  },
+  {
+    "ip": "208.67.220.220",
+    "city": "San Francisco",
+    "country": "United States"
+  },
+  {
+    "ip": "76.76.19.19",
+    "city": "Miami",
+    "country": "United States"
+  }
+]

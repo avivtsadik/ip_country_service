@@ -1,6 +1,7 @@
 package datastores
 
 import (
+	"context"
 	"errors"
 	"os"
 	"testing"
@@ -34,7 +35,7 @@ func TestCSVDataStore_Load(t *testing.T) {
 	testData := "8.8.8.8,Mountain View,United States\n1.1.1.1,San Francisco,United States\n"
 	ds := setupTestDatastore(t, testData)
 
-	err := ds.Load()
+	err := ds.Load(context.Background())
 	if err != nil {
 		t.Fatalf("failed to load CSV: %v", err)
 	}
@@ -44,11 +45,11 @@ func TestCSVDataStore_FindLocation_Success(t *testing.T) {
 	testData := "8.8.8.8,Mountain View,United States\n1.1.1.1,San Francisco,United States\n"
 	ds := setupTestDatastore(t, testData)
 
-	if err := ds.Load(); err != nil {
+	if err := ds.Load(context.Background()); err != nil {
 		t.Fatalf("failed to load CSV: %v", err)
 	}
 
-	location, err := ds.FindLocation("8.8.8.8")
+	location, err := ds.FindLocation(context.Background(), "8.8.8.8")
 	if err != nil {
 		t.Fatalf("expected successful lookup, got error: %v", err)
 	}
@@ -65,11 +66,11 @@ func TestCSVDataStore_FindLocation_NotFound(t *testing.T) {
 	testData := "8.8.8.8,Mountain View,United States\n"
 	ds := setupTestDatastore(t, testData)
 
-	if err := ds.Load(); err != nil {
+	if err := ds.Load(context.Background()); err != nil {
 		t.Fatalf("failed to load CSV: %v", err)
 	}
 
-	_, err := ds.FindLocation("1.2.3.4")
+	_, err := ds.FindLocation(context.Background(), "1.2.3.4")
 	if !errors.Is(err, appErrors.ErrIPNotFound) {
 		t.Errorf("expected ErrIPNotFound, got %v", err)
 	}
@@ -79,11 +80,11 @@ func TestCSVDataStore_FindLocation_InvalidIP(t *testing.T) {
 	testData := "8.8.8.8,Mountain View,United States\n"
 	ds := setupTestDatastore(t, testData)
 
-	if err := ds.Load(); err != nil {
+	if err := ds.Load(context.Background()); err != nil {
 		t.Fatalf("failed to load CSV: %v", err)
 	}
 
-	_, err := ds.FindLocation("invalid-ip")
+	_, err := ds.FindLocation(context.Background(), "invalid-ip")
 	if !errors.Is(err, appErrors.ErrInvalidIP) {
 		t.Errorf("expected ErrInvalidIP, got %v", err)
 	}
@@ -91,7 +92,7 @@ func TestCSVDataStore_FindLocation_InvalidIP(t *testing.T) {
 
 func TestCSVDataStore_Load_InvalidFile(t *testing.T) {
 	ds := NewCSVDataStore("nonexistent.csv")
-	err := ds.Load()
+	err := ds.Load(context.Background())
 	if err == nil {
 		t.Error("expected error loading nonexistent file")
 	}
@@ -101,7 +102,7 @@ func TestCSVDataStore_Load_MalformedCSV(t *testing.T) {
 	testData := "8.8.8.8,Mountain View\n1.1.1.1,San Francisco,United States,Extra\n"
 	ds := setupTestDatastore(t, testData)
 
-	err := ds.Load()
+	err := ds.Load(context.Background())
 	if err == nil {
 		t.Error("expected error loading malformed CSV")
 	}
@@ -111,7 +112,7 @@ func TestCSVDataStore_Load_InvalidIPInCSV(t *testing.T) {
 	testData := "invalid-ip,Mountain View,United States\n"
 	ds := setupTestDatastore(t, testData)
 
-	err := ds.Load()
+	err := ds.Load(context.Background())
 	if err == nil {
 		t.Error("expected error loading CSV with invalid IP")
 	}

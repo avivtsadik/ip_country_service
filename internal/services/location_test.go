@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -10,21 +11,21 @@ import (
 
 // mockDataStore implements datastore's.DataStore interface for testing
 type mockDataStore struct {
-	findLocationFunc func(ip string) (*models.Location, error)
-	loadFunc         func() error
+	findLocationFunc func(ctx context.Context, ip string) (*models.Location, error)
+	loadFunc         func(ctx context.Context) error
 	closeFunc        func() error
 }
 
-func (m *mockDataStore) FindLocation(ip string) (*models.Location, error) {
+func (m *mockDataStore) FindLocation(ctx context.Context, ip string) (*models.Location, error) {
 	if m.findLocationFunc != nil {
-		return m.findLocationFunc(ip)
+		return m.findLocationFunc(ctx, ip)
 	}
 	return nil, appErrors.ErrIPNotFound
 }
 
-func (m *mockDataStore) Load() error {
+func (m *mockDataStore) Load(ctx context.Context) error {
 	if m.loadFunc != nil {
-		return m.loadFunc()
+		return m.loadFunc(ctx)
 	}
 	return nil
 }
@@ -44,7 +45,7 @@ func TestLocationService_FindCountry_Success(t *testing.T) {
 	}
 
 	mockDS := &mockDataStore{
-		findLocationFunc: func(ip string) (*models.Location, error) {
+		findLocationFunc: func(ctx context.Context, ip string) (*models.Location, error) {
 			if ip == "8.8.8.8" {
 				return expectedLocation, nil
 			}
@@ -54,7 +55,7 @@ func TestLocationService_FindCountry_Success(t *testing.T) {
 
 	service := NewLocationService(mockDS)
 
-	location, err := service.FindCountry("8.8.8.8")
+	location, err := service.FindCountry(context.Background(), "8.8.8.8")
 	if err != nil {
 		t.Fatalf("expected no error, got: %v", err)
 	}
@@ -82,7 +83,7 @@ func TestLocationService_FindCountry_InvalidIP(t *testing.T) {
 
 	for _, invalidIP := range testCases {
 		t.Run("invalid_ip_"+invalidIP, func(t *testing.T) {
-			_, err := service.FindCountry(invalidIP)
+			_, err := service.FindCountry(context.Background(), invalidIP)
 			if !errors.Is(err, appErrors.ErrInvalidIP) {
 				t.Errorf("expected ErrInvalidIP for '%s', got: %v", invalidIP, err)
 			}
@@ -92,14 +93,14 @@ func TestLocationService_FindCountry_InvalidIP(t *testing.T) {
 
 func TestLocationService_FindCountry_IPNotFound(t *testing.T) {
 	mockDS := &mockDataStore{
-		findLocationFunc: func(ip string) (*models.Location, error) {
+		findLocationFunc: func(ctx context.Context, ip string) (*models.Location, error) {
 			return nil, appErrors.ErrIPNotFound
 		},
 	}
 
 	service := NewLocationService(mockDS)
 
-	_, err := service.FindCountry("1.2.3.4")
+	_, err := service.FindCountry(context.Background(), "1.2.3.4")
 	if err == nil {
 		t.Fatal("expected error, got nil")
 	}
@@ -114,14 +115,14 @@ func TestLocationService_FindCountry_DatastoreError(t *testing.T) {
 	datastoreErr := errors.New("database connection failed")
 
 	mockDS := &mockDataStore{
-		findLocationFunc: func(ip string) (*models.Location, error) {
+		findLocationFunc: func(ctx context.Context, ip string) (*models.Location, error) {
 			return nil, datastoreErr
 		},
 	}
 
 	service := NewLocationService(mockDS)
 
-	_, err := service.FindCountry("8.8.8.8")
+	_, err := service.FindCountry(context.Background(), "8.8.8.8")
 	if err == nil {
 		t.Fatal("expected error, got nil")
 	}
@@ -136,7 +137,7 @@ func TestLocationService_FindCountry_IPNormalization(t *testing.T) {
 	var receivedIP string
 
 	mockDS := &mockDataStore{
-		findLocationFunc: func(ip string) (*models.Location, error) {
+		findLocationFunc: func(ctx context.Context, ip string) (*models.Location, error) {
 			receivedIP = ip
 			return &models.Location{
 				IP:      ip,
@@ -149,7 +150,7 @@ func TestLocationService_FindCountry_IPNormalization(t *testing.T) {
 	service := NewLocationService(mockDS)
 
 	// Test whitespace trimming
-	_, err := service.FindCountry("  8.8.8.8  ")
+	_, err := service.FindCountry(context.Background(), "  8.8.8.8  ")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

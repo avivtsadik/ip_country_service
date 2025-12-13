@@ -3,6 +3,8 @@ package middleware
 import (
 	"testing"
 	"time"
+
+	"ip_country_project/internal/utils"
 )
 
 func TestRateLimiter_Allow(t *testing.T) {
@@ -93,10 +95,10 @@ func TestRateLimiter_ConcurrentAccess(t *testing.T) {
 	done := make(chan bool, 20)
 	
 	for i := 0; i < 20; i++ {
-		go func() {
+		utils.Go(func() {
 			rl.Allow() // Just call it, don't care about result
 			done <- true
-		}()
+		})
 	}
 	
 	// Wait for all goroutines to complete

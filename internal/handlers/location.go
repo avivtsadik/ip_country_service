@@ -35,8 +35,8 @@ func (h *LocationHandler) FindCountry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Call service
-	location, err := h.service.FindCountry(ip)
+	// Call service with request context
+	location, err := h.service.FindCountry(r.Context(), ip)
 	if err != nil {
 		h.handleServiceError(w, err)
 		return

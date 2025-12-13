@@ -1,6 +1,7 @@
 package datastores
 
 import (
+	"context"
 	"encoding/csv"
 	"fmt"
 	"os"
@@ -24,7 +25,7 @@ func NewCSVDataStore(filePath string) *CSVDataStore {
 	}
 }
 
-func (c *CSVDataStore) Load() error {
+func (c *CSVDataStore) Load(ctx context.Context) error {
 	file, err := os.Open(c.filePath)
 	if err != nil {
 		return fmt.Errorf("failed to open CSV file: %w", err)
@@ -32,6 +33,8 @@ func (c *CSVDataStore) Load() error {
 	defer file.Close()
 
 	reader := csv.NewReader(file)
+	// NOTE: CSV is loaded fully into memory at startup.
+	// This is acceptable for the exercise and small datasets.
 	records, err := reader.ReadAll()
 	if err != nil {
 		return fmt.Errorf("failed to read CSV: %w", err)
@@ -61,7 +64,7 @@ func (c *CSVDataStore) Load() error {
 	return nil
 }
 
-func (c *CSVDataStore) FindLocation(ip string) (*models.Location, error) {
+func (c *CSVDataStore) FindLocation(ctx context.Context, ip string) (*models.Location, error) {
 	if !utils.IsValidIP(ip) {
 		return nil, errors.ErrInvalidIP
 	}

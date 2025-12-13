@@ -26,7 +26,7 @@ WORKDIR /root/
 # Copy the binary from builder stage
 COPY --from=builder /app/main .
 
-# Copy testdata directory
+# Copy testdata directory (includes both CSV and JSON sample data)
 COPY --from=builder /app/testdata ./testdata
 
 # Expose port
@@ -37,6 +37,10 @@ ENV PORT=8080
 ENV RATE_LIMIT_RPS=10.0
 ENV DATASTORE_TYPE=csv
 ENV DATASTORE_FILE=testdata/sample_ips.csv
+
+# Note: Can switch to JSON datastore by setting:
+# ENV DATASTORE_TYPE=json
+# ENV DATASTORE_FILE=testdata/sample_ips.json
 
 # Run the binary
 CMD ["./main"]

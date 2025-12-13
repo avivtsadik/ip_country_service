@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -170,7 +171,7 @@ func TestIntegration_RateLimiting(t *testing.T) {
 	})
 
 	datastore := datastores.NewCSVDataStore(tmpFile.Name())
-	if loadErr := datastore.Load(); loadErr != nil {
+	if loadErr := datastore.Load(context.Background()); loadErr != nil {
 		t.Fatalf("failed to load CSV: %v", loadErr)
 	}
 

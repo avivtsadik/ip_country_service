@@ -6,7 +6,7 @@ A production-grade REST API service that provides IP geolocation lookups with ra
 
 - **REST API** with `/v1/find-country` endpoint
 - **Custom rate limiting** using token bucket algorithm
-- **Extensible datastore** interface (currently supports CSV)
+- **Extensible datastore** interface (supports CSV and JSON formats)
 - **Production-ready** with graceful shutdown and proper error handling
 - **Comprehensive test suite** with unit and integration tests
 
@@ -26,18 +26,39 @@ DATASTORE_FILE=testdata/sample_ips.csv
 **Environment Variables:**
 - `PORT` - Server port (default: 8080)
 - `RATE_LIMIT_RPS` - Requests per second limit (default: 10.0)
-- `DATASTORE_TYPE` - Type of datastore (currently only "csv")
-- `DATASTORE_FILE` - Path to CSV data file
+- `DATASTORE_TYPE` - Type of datastore ("csv" or "json", default: "csv")
+- `DATASTORE_FILE` - Path to data file (CSV or JSON format)
+
+**Note:** JSON datastore support was added as a bonus feature to demonstrate the service's extensibility to multiple data sources.
 
 ### 2. Data File
 
-Ensure your CSV file exists with the format:
+**CSV Format:**
 ```csv
 8.8.8.8,Mountain View,United States
 1.1.1.1,San Francisco,United States
 ```
 
-The sample data file is provided at `testdata/sample_ips.csv`.
+**JSON Format (Bonus Feature):**
+```json
+[
+  {"ip": "8.8.4.4", "city": "Mountain View", "country": "United States"},
+  {"ip": "1.0.0.1", "city": "Research", "country": "Australia"}
+]
+```
+
+Sample data files are provided:
+- `testdata/sample_ips.csv` (default)
+- `testdata/sample_ips.json` (bonus extensibility demo)
+
+**Switching Between Datastores:**
+```bash
+# Use CSV datastore
+DATASTORE_TYPE=csv DATASTORE_FILE=testdata/sample_ips.csv go run .
+
+# Use JSON datastore (bonus feature)
+DATASTORE_TYPE=json DATASTORE_FILE=testdata/sample_ips.json go run .
+```
 
 ## Running the Service
 
@@ -137,12 +158,13 @@ go test ./internal/middleware/ -v
 
 The project includes comprehensive tests:
 
-- **Unit Tests** (19 tests) - Fast, isolated tests with mocks
+- **Unit Tests** (27 tests) - Fast, isolated tests with mocks
   - Service layer business logic
   - IP validation utilities  
   - Safe goroutine wrapper
   - Rate limiter algorithm
   - CSV datastore functionality
+  - JSON datastore functionality (bonus)
 
 - **Integration Tests** (7 tests) - End-to-end functionality
   - HTTP handlers with full request/response cycle
@@ -211,3 +233,26 @@ The service follows clean architecture principles with clear separation of conce
 - **Utils** provide reusable utilities
 
 All components are unit tested with minimal dependencies for fast, reliable testing.
+
+## Bonus Features
+
+### 1. **Comprehensive Testing** ✅
+- **Unit Tests**: 27 tests covering all components with mocks
+- **Integration Tests**: 7 end-to-end tests with full HTTP request/response cycle
+- **Test Organization**: Tests follow Go conventions (next to source code)
+- **Safe Goroutines**: All test goroutines use panic recovery
+- **Context Support**: Full context propagation throughout the application
+
+### 2. **Docker Containerization** ✅
+- Multi-stage Dockerfile with optimized build using Go 1.24-alpine
+- Executable build and run scripts (`build.sh`, `run.sh`)
+- Production-ready container with proper environment configuration
+
+### 3. **Multiple Datastore Support** ✅ (Extensibility Demo)
+- **JSON Datastore**: Added as bonus to demonstrate extensible architecture
+- **Environment-driven switching**: Simple `DATASTORE_TYPE` configuration
+- **Identical interface**: Both CSV and JSON implement the same `DataStore` interface
+- **Comprehensive testing**: 8 additional tests for JSON datastore implementation
+- **Different sample data**: Each datastore has unique test data to demonstrate switching
+
+This demonstrates how easily new data sources can be added (databases, APIs, etc.) without changing the core application logic.
