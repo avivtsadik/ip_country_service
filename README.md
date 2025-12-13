@@ -29,6 +29,13 @@ DATASTORE_FILE=testdata/sample_ips.csv
 - `DATASTORE_TYPE` - Type of datastore ("csv" or "json", default: "csv")
 - `DATASTORE_FILE` - Path to data file (CSV or JSON format)
 
+**IDE Configuration (GoLand/IntelliJ):**
+1. Create `.env` file with your configuration
+2. Open **Run/Debug Configurations** (top-right dropdown next to ▶️)
+3. Choose **Edit Configurations...**
+4. Load environment variables from your `.env` file
+5. Alternatively, set environment variables manually in the IDE
+
 **Note:** JSON datastore support was added as a bonus feature to demonstrate the service's extensibility to multiple data sources.
 
 ### 2. Data File
