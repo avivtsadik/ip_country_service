@@ -31,8 +31,7 @@ func (s *LocationService) FindCountry(ctx context.Context, ip string) (*models.L
 	// Delegate to datastore with context
 	location, err := s.datastore.FindLocation(ctx, normalizedIP)
 	if err != nil {
-		// Wrap datastore errors with context for better logging
-		return nil, fmt.Errorf("datastore lookup failed: %w", err)
+		return nil, fmt.Errorf("%w: %s", errors.ErrDatastoreLookupFailed, err)
 	}
 
 	return location, nil

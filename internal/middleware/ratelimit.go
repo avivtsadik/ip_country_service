@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"ip_country_project/internal/errors"
 	"ip_country_project/internal/models"
 )
 
@@ -55,7 +56,10 @@ func (l *RateLimiter) Middleware(next http.Handler) http.Handler {
 		if !l.Allow() {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusTooManyRequests)
-			json.NewEncoder(w).Encode(models.ErrorResponse{Error: "rate limit exceeded"})
+			if err := json.NewEncoder(w).Encode(models.ErrorResponse{Error: errors.ErrRateLimited.Error()}); err != nil {
+				// If JSON encoding fails, write a simple text response
+				w.Write([]byte(errors.ErrRateLimited.Error()))
+			}
 			return
 		}
 		next.ServeHTTP(w, r)

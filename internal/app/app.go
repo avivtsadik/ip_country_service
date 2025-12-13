@@ -7,6 +7,7 @@ import (
 
 	"ip_country_project/internal/config"
 	"ip_country_project/internal/datastores"
+	"ip_country_project/internal/errors"
 	"ip_country_project/internal/handlers"
 	"ip_country_project/internal/middleware"
 	"ip_country_project/internal/services"
@@ -31,7 +32,7 @@ func New(cfg *config.Config) (*Application, error) {
 	case "json":
 		datastore = datastores.NewJSONDataStore(cfg.DatastoreFile)
 	default:
-		return nil, fmt.Errorf("unsupported datastore type: %s", cfg.DatastoreType)
+		return nil, fmt.Errorf("%w: %s", errors.ErrUnsupportedDatastoreType, cfg.DatastoreType)
 	}
 
 	if err := datastore.Load(context.Background()); err != nil {

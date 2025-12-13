@@ -24,14 +24,14 @@ func (h *LocationHandler) FindCountry(w http.ResponseWriter, r *http.Request) {
 	// Only allow GET requests
 	if r.Method != http.MethodGet {
 		w.Header().Set("Allow", http.MethodGet)
-		h.writeError(w, "method not allowed", http.StatusMethodNotAllowed)
+		h.writeError(w, appErrors.ErrMethodNotAllowed.Error(), http.StatusMethodNotAllowed)
 		return
 	}
 
 	// Get IP parameter from query string
 	ip := r.URL.Query().Get("ip")
 	if ip == "" {
-		h.writeError(w, "missing ip parameter", http.StatusBadRequest)
+		h.writeError(w, appErrors.ErrMissingIPParam.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -50,17 +50,17 @@ func (h *LocationHandler) FindCountry(w http.ResponseWriter, r *http.Request) {
 
 func (h *LocationHandler) handleServiceError(w http.ResponseWriter, err error) {
 	if errors.Is(err, appErrors.ErrInvalidIP) {
-		h.writeError(w, "invalid IP address format", http.StatusBadRequest)
+		h.writeError(w, appErrors.ErrInvalidIP.Error(), http.StatusBadRequest)
 		return
 	}
 	
 	if errors.Is(err, appErrors.ErrIPNotFound) {
-		h.writeError(w, "IP address not found", http.StatusNotFound)
+		h.writeError(w, appErrors.ErrIPNotFound.Error(), http.StatusNotFound)
 		return
 	}
 
 	// All other errors are internal server errors
-	h.writeError(w, "internal server error", http.StatusInternalServerError)
+	h.writeError(w, appErrors.ErrInternalServer.Error(), http.StatusInternalServerError)
 }
 
 func (h *LocationHandler) writeError(w http.ResponseWriter, message string, statusCode int) {

@@ -33,7 +33,7 @@ func (c *CSVDataStore) Load(ctx context.Context) error {
 	defer file.Close()
 
 	reader := csv.NewReader(file)
-	// NOTE: CSV is loaded fully into memory at startup.
+	// CSV is loaded fully into memory at startup.
 	// This is acceptable for the exercise and small datasets.
 	records, err := reader.ReadAll()
 	if err != nil {

@@ -13,6 +13,7 @@ import (
 
 	"ip_country_project/internal/app"
 	"ip_country_project/internal/config"
+	appErrors "ip_country_project/internal/errors"
 	safe "ip_country_project/internal/utils"
 )
 
@@ -29,7 +30,7 @@ func main() {
 	// Initialize application
 	application, err := app.New(cfg)
 	if err != nil {
-		log.Fatalf("Failed to initialize application: %v", err)
+		log.Fatalf("%s: %v", appErrors.ErrAppInit.Error(), err)
 	}
 
 	// Create server with production timeouts
