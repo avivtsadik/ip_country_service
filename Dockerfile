@@ -40,8 +40,8 @@ ENV DATASTORE_TYPE=csv
 ENV DATASTORE_FILE=testdata/sample_ips.csv
 
 # Note: Can switch to JSON datastore by setting:
-# ENV DATASTORE_TYPE=json
-# ENV DATASTORE_FILE=testdata/sample_ips.json
+#ENV DATASTORE_TYPE=json
+#ENV DATASTORE_FILE=testdata/sample_ips.json
 
 # Run the binary
 CMD ["./main"]
