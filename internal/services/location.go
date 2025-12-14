@@ -21,10 +21,10 @@ func NewLocationService(datastore datastores.DataStore) *LocationService {
 
 func (s *LocationService) FindCountry(ctx context.Context, ip string) (*models.Location, error) {
 	// Normalize and validate IP format
-	normalizedIP := utils.NormalizeIP(ip)
-	if normalizedIP == "" {
+	if !utils.IsValidIP(ip) {
 		return nil, errors.ErrInvalidIP
 	}
+	normalizedIP := utils.NormalizeIP(ip)
 
 	// Delegate to datastore with context
 	location, err := s.datastore.FindLocation(ctx, normalizedIP)
