@@ -7,7 +7,6 @@ var (
 	ErrIPNotFound               = errors.New("IP address not found")
 	ErrInvalidIP                = errors.New("invalid IP address format")
 	ErrUnsupportedDatastoreType = errors.New("unsupported datastore type")
-	ErrDatastoreLookupFailed    = errors.New("datastore lookup failed")
 )
 
 // ErrRateLimited Rate limiter errors

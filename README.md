@@ -17,6 +17,7 @@ A production-grade REST API service that provides IP geolocation lookups with ra
 Create a `.env` file in the project root:
 
 ```env
+HOST=localhost
 PORT=8080
 RATE_LIMIT_RPS=10.0
 DATASTORE_TYPE=csv
@@ -24,6 +25,7 @@ DATASTORE_FILE=testdata/sample_ips.csv
 ```
 
 **Environment Variables:**
+- `HOST` - Server host/interface (default: "localhost", use "0.0.0.0" for all interfaces)
 - `PORT` - Server port (default: 8080)
 - `RATE_LIMIT_RPS` - Requests per second limit (default: 10.0)
 - `DATASTORE_TYPE` - Type of datastore ("csv" or "json", default: "csv")
@@ -92,12 +94,12 @@ docker build -t ip-country-service .
 docker run -p 8080:8080 ip-country-service
 ```
 
-The service will start on the configured port and display:
+The service will start on the configured host and port and display:
 ```
-IP Country Service starting on port 8080
+IP Country Service starting on localhost:8080
 Rate limit: 10.0 RPS
 Datastore: csv (testdata/sample_ips.csv)
-Server starting on port :8080
+Server starting on localhost:8080
 Endpoints available:
   GET /v1/find-country?ip=8.8.8.8
   GET /health

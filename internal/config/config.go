@@ -7,6 +7,7 @@ import (
 )
 
 type Config struct {
+	Host          string
 	Port          string
 	RateLimitRPS  float64
 	DatastoreType string
@@ -15,6 +16,7 @@ type Config struct {
 
 func Load() (*Config, error) {
 	config := &Config{
+		Host:          getEnv("HOST", "localhost"),
 		Port:          getEnv("PORT", "8080"),
 		DatastoreType: getEnv("DATASTORE_TYPE", "csv"),
 		DatastoreFile: getEnv("DATASTORE_FILE", "testdata/sample_ips.csv"),

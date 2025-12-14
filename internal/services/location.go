@@ -2,8 +2,6 @@ package services
 
 import (
 	"context"
-	"fmt"
-
 	"ip_country_project/internal/datastores"
 	"ip_country_project/internal/errors"
 	"ip_country_project/internal/models"
@@ -31,7 +29,7 @@ func (s *LocationService) FindCountry(ctx context.Context, ip string) (*models.L
 	// Delegate to datastore with context
 	location, err := s.datastore.FindLocation(ctx, normalizedIP)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %s", errors.ErrDatastoreLookupFailed, err)
+		return nil, err
 	}
 
 	return location, nil

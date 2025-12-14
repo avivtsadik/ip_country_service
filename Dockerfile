@@ -33,6 +33,7 @@ COPY --from=builder /app/testdata ./testdata
 EXPOSE 8080
 
 # Set environment variables with defaults
+ENV HOST=0.0.0.0
 ENV PORT=8080
 ENV RATE_LIMIT_RPS=10.0
 ENV DATASTORE_TYPE=csv
